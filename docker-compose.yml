@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: celebrity_ai_db
+      POSTGRES_USER: akram
+      POSTGRES_PASSWORD: zakram2704
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+
+  web:
+    build: .
+    command: daphne -b 0.0.0.0 -p 8000 celebrity_ai.asgi:application
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      - DJANGO_SETTINGS_MODULE=celebrity_ai.settings  
+
+volumes:
+  postgres_data:
