@@ -13,5 +13,5 @@ venv/
 .env.local
 .idea/
 .vscode/
-
+service-account.json
 api.http
