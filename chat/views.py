@@ -12,6 +12,10 @@ from .serializers import (
     MessageSerializer
 )
 from chat import serializers
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 
@@ -201,3 +205,54 @@ class DiscordLogin(SocialLoginView):
             "access": str(refresh.access_token),
             "refresh": str(refresh),
         })
+from django.http import JsonResponse
+import requests
+from django.conf import settings
+
+CLIENT_ID = os.getenv("DISCORD_CLIENT_ID")
+CLIENT_SECRET = os.getenv("DISCORD_SECRET")
+REDIRECT_URI = 'https://celebrity-ai-629761755982.europe-west3.run.app/auth/discord/callback/'  # must match exactly
+SCOPE = 'identify email'
+
+def discord_callback(request):
+    code = request.GET.get('code')
+    if not code:
+        return JsonResponse({'error': 'No code provided'}, status=400)
+
+    # Exchange code for access token
+    data = {
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': REDIRECT_URI,
+    }
+
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    token_response = requests.post(
+        'https://discord.com/api/oauth2/token',
+        data=data,
+        headers=headers
+    )
+
+    if token_response.status_code != 200:
+        return JsonResponse({'error': 'Failed to get token', 'details': token_response.text}, status=token_response.status_code)
+
+    access_token = token_response.json().get('access_token')
+
+    # You can fetch user info now
+    user_response = requests.get(
+        'https://discord.com/api/users/@me',
+        headers={'Authorization': f'Bearer {access_token}'}
+    )
+
+    user_data = user_response.json()
+
+    # Example: return user data to Flutter (or create your own token)
+    return JsonResponse({
+        'discord_user': user_data,
+        'access_token': access_token
+    })

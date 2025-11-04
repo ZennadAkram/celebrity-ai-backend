@@ -1,19 +1,39 @@
 from rest_framework import serializers
 from .models import Category, User,ChatSession,Message,Celebrity
 class UserSerializer(serializers.ModelSerializer):
-    password=serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
     class Meta:
-        model=User
-        fields=['id','username','password','user_avatar','email']
+        model = User
+        fields = ['id', 'username', 'password', 'user_avatar', 'email']
 
     def create(self, validated_data):
-       user= User(username=validated_data["username"],
+        avatar = validated_data.pop('user_avatar', None)
+        user = User(
+            username=validated_data["username"],
             email=validated_data.get("email"),
-            user_avatar=validated_data.get("user_avatar"),
         )
-       user.set_password(validated_data["password"])  # hash password properly
-       user.save()
-       return user
+        user.set_password(validated_data["password"])
+        user.save()
+
+        if avatar:
+            user.user_avatar.save(avatar.name, avatar, save=True)  # ✅ triggers GCS upload
+
+        return user
+    def update(self, instance, validated_data):
+     avatar = validated_data.pop('user_avatar', None)
+     instance.username = validated_data.get('username', instance.username)
+     instance.email = validated_data.get('email', instance.email)
+     password = validated_data.get('password', None)
+     if password:
+        instance.set_password(password)
+     instance.save()
+
+     if avatar:
+        instance.user_avatar.save(avatar.name, avatar, save=True)  # ✅ triggers GCS upload
+
+     return instance
+
 
 class CelebritySerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(

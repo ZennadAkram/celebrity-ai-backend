@@ -1,24 +1,29 @@
-# Use official Python image
 FROM python:3.12-slim
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE=celebrity_ai.settings
 
-
-# Set working directory
 WORKDIR /app
 
-# Install dependencies
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
 COPY requirements.txt /app/
+COPY service-account.json /app/service-account.json
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# Copy project
 COPY . /app/
 
-# Expose port
-EXPOSE 8000
 
-# Run Daphne ASGI server
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "celebrity_ai.asgi:application"]
+
+
+
+
+CMD HOME=/root python3 manage.py runserver 0.0.0.0:8000 --noreload

@@ -157,8 +157,8 @@ DATABASES = {
 }
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),   # default is 5 minutes
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),      # default is 1 day
-    "ROTATE_REFRESH_TOKENS": False,
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
@@ -213,6 +213,14 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-MEDIA_ROOT = BASE_DIR / 'media'
-MEDIA_URL = '/media/'
+# settings.py
 
+if os.getenv("GOOGLE_CLOUD_PROJECT") and os.getenv("DEBUG")==False:
+    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    GS_BUCKET_NAME = os.getenv("GS_BUCKET_NAME")
+    MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/"
+    # Ensure Django knows where the credentials are
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+else:
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"

@@ -5,9 +5,10 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth import get_user_model
+import uuid
 
-from chat.agent import agent_chat
-from chat.models import User
+from chat.agent import  agent_chat_stream, extract_text_from_delta, get_user_and_celebrity
+from chat.models import Celebrity, User
 
 class AsyncConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -32,10 +33,7 @@ class AsyncConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-        await self.send(text_data=json.dumps({
-            'type': 'system',
-            'message': f'Welcome {user.username}! How can I help you today?'
-        }))
+       
     @database_sync_to_async
     def get_user_from_token(self, token):
         if not token:
@@ -57,22 +55,39 @@ class AsyncConsumer(AsyncWebsocketConsumer):
         celebrity_id = data['celebrity_id']
         user=self.scope['user']
         asyncio.create_task(self.process_ai_response(message,user.id,celebrity_id))
-    async def process_ai_response(self, user_message,user_id,celebrity_id):
-        """Process user message with AI agent"""
-        try:
-            # Run AI processing in thread pool (since agent_chat might be sync)
-            ai_response = await asyncio.to_thread(agent_chat, user_message, user_id, celebrity_id)
+    async def process_ai_response(self, user_message, user_id, celebrity_id):
+     user, celebrity = await get_user_and_celebrity(user_id, celebrity_id)
+    
+     instructions = f"{celebrity.description}. You are chatting with {user.username}. Use his name in the conversation."
+
+     token_count = 0
+     message_id = str(uuid.uuid4())
+    
+     try:
+        # 🔥 BETTER: Use a thread with proper async streaming
+        def generate_tokens():
+            return agent_chat_stream(user_message, instructions)
+        
+        # Get the generator
+        token_generator = await asyncio.to_thread(generate_tokens)
+        
+        # 🔥 Stream tokens as they come
+        for token in token_generator:
+            token_count += 1
             await self.send(text_data=json.dumps({
-                'type': 'ai_message',
-                'message': ai_response,
+                'type': 'ai_message', 
+                'message': token,
+                'message_id': message_id,
                 'username': 'AI Assistant'
             }))
+            await asyncio.sleep(0.03)
             
-        except Exception as e:
-            await self.send(text_data=json.dumps({
-                'type': 'error',
-                'message': f'Sorry, I encountered an error: {str(e)}',
-                'username': 'System'
-            }))
-    
+     except Exception as e:
+        print(f"Error: {e}")
 
+     await self.send(text_data=json.dumps({
+        'type': 'ai_message_done',
+        'message': '',
+        'message_id': message_id,  
+        'username': 'AI Assistant'
+    }))

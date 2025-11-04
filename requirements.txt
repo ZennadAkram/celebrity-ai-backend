@@ -8,6 +8,7 @@ attrs==25.3.0
 autobahn==24.4.2
 Automat==25.4.16
 Brotli==1.1.0
+cachetools==6.2.1
 certifi==2025.8.3
 cffi==2.0.0
 channels==4.3.1
@@ -25,6 +26,7 @@ django-allauth==65.11.2
 django-cors-headers==4.9.0
 django-filter==25.2
 django-postgres-copy==2.8.0
+django-storages==1.14.6
 djangorestframework==3.16.1
 djangorestframework_simplejwt==5.5.1
 duckduckgo_search==8.1.1
@@ -32,6 +34,13 @@ fastuuid==0.13.5
 filelock==3.19.1
 frozenlist==1.7.0
 fsspec==2025.9.0
+google-api-core==2.28.0
+google-auth==2.42.0
+google-cloud-core==2.4.3
+google-cloud-storage==3.4.1
+google-crc32c==1.7.1
+google-resumable-media==2.7.2
+googleapis-common-protos==1.71.0
 h11==0.16.0
 h2==4.3.0
 hf-xet==1.1.10
@@ -60,6 +69,8 @@ packaging==25.0
 pillow==11.3.0
 primp==0.15.0
 propcache==0.3.2
+proto-plus==1.26.1
+protobuf==6.33.0
 psycopg2-binary==2.9.11
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
@@ -77,6 +88,7 @@ regex==2025.9.18
 requests==2.32.5
 rich==14.1.0
 rpds-py==0.27.1
+rsa==4.9.1
 service-identity==24.2.0
 setuptools==80.9.0
 smolagents==1.22.0

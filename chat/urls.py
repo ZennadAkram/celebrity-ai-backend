@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import (
 
 from .views import UserViewSet, CelebrityViewSet, ChatSessionViewSet, MessageViewSet
 from .views import CategoryViewSet
+from chat import views
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'celebrities', CelebrityViewSet)
@@ -22,6 +23,7 @@ urlpatterns = [
     # JWT authentication endpoints
     path('auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+     path('auth/discord/callback/', views.discord_callback),
     
     ]
 
