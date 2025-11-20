@@ -1,5 +1,7 @@
 # Celebrity AI - Backend (Django REST Framework)
 
+[![License: Private](https://img.shields.io/badge/License-Private-red.svg)](LICENSE)
+
 This is the **backend** for the Celebrity AI project. It provides a REST API for user management, celebrity profiles, chat sessions, messaging, and AI integration. The backend is built with **Django REST Framework**, supporting JWT authentication and social logins (Google, Facebook, Discord), with **Django Channels** and **Daphne** for real-time features.
 
 ---
@@ -44,11 +46,3 @@ This is the **backend** for the Celebrity AI project. It provides a REST API for
 - SmolAgents + DeepSeek for AI-powered chat
 
 ---
-
-## Getting Started
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/<your_username>/celebrity-ai.git
-cd celebrity-ai/backend
