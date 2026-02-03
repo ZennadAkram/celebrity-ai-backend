@@ -72,13 +72,6 @@ This is the backend for the Celebrity AI project. It provides a REST API for use
 | `GET`  | `/api/celebrities/` | List all celebrities |
 | `POST` | `/api/celebrities/` | Create celebrity (admin) |
 
-### Chat
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/api/chat/sessions/` | Create chat session |
-| `POST` | `/api/chat/messages/` | Send message |
-| `WS`   | `/ws/chat/{session_id}/` | WebSocket for AI streaming |
-
 **Full interactive documentation available at `/swagger/`**
 
 ## 🚀 Quick Start
@@ -91,7 +84,7 @@ This is the backend for the Celebrity AI project. It provides a REST API for use
 ### Installation
 ```bash
 # Clone repository
-git clone <your-backend-repo>
+git clone https://github.com/ZennadAkram/celebrity-ai-backend/
 cd celebrity_ai_backend
 
 # Create virtual environment
